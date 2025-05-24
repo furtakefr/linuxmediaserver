@@ -1,21 +1,29 @@
-# Media Server for Raspberry Pi 5
+# Linux Media Server Stack na Raspberry Pi 5
 
-This setup includes:
-- Jellyfin (8096)
-- Radarr (7878)
-- Sonarr (8989)
-- Overseerr (5055)
-- qBittorrent (8080)
-- Bazarr (6767)
-- Jackett (9117)
+Tento projekt obsahuje kompletný balík pre inštaláciu a spustenie mediálneho servera so službami:  
+- Jellyfin (media server)  
+- Radarr (filmy)  
+- Sonarr (seriály)  
+- Overseerr (správa požiadaviek)  
+- Bazarr (automatické titulky)  
+- Jackett (indexery pre torrent a NZB)  
 
-## Installation
+---
+
+## Predpoklady
+
+- Raspberry Pi 5 s Raspberry Pi OS (Debian-based)  
+- Docker a Docker Compose nainštalované  
+- SSD disky pripojené a namountované napr. na `/mnt/Media`  
+- Používateľ s právami sudo  
+- Základné znalosti práce s Linuxom  
+
+---
+
+## 1. Vytvorenie priečinkov
+
+Spusti skript, ktorý vytvorí potrebné adresáre:
 
 ```bash
-chmod +x install.sh mount-ssds.sh
-sudo ./install.sh
-```
-
-All media is stored under:
-- `/mnt/Media` for movies/TV
-- `/mnt/Kamera` for camera footage
+chmod +x setup_folders.sh
+./setup_folders.sh
