@@ -20,10 +20,7 @@ get_disks() {
     done
 }
 
-for line in $(get_disks); do
-    dev=$(echo $line | cut -d' ' -f1)
-    label=$(echo $line | cut -d' ' -f2)
-
+get_disks | while read dev label; do
     echo "Formatting $dev as $label..."
     mkfs.ext4 -F $dev
     uuid=$(blkid -s UUID -o value $dev)
