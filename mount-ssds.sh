@@ -9,20 +9,20 @@ if [[ "$confirm" != "yes" ]]; then
     exit 1
 fi
 
-get_uuid() {
-    lsblk -o NAME,SIZE,UUID -dn | while read name size uuid; do
-        sizegb=$(echo $size | grep -o '[0-9]*')
-        if [[ "$sizegb" -ge 700 && "$uuid" == "" ]]; then
+get_disks() {
+    lsblk -b -d -o NAME,SIZE -n | while read name size; do
+        size_gb=$((size / 1024 / 1024 / 1024))
+        if [[ $size_gb -ge 700 ]]; then
             echo "/dev/$name MEDIA"
-        elif [[ "$sizegb" -ge 300 && "$sizegb" -lt 700 && "$uuid" == "" ]]; then
+        elif [[ $size_gb -ge 300 && $size_gb -lt 700 ]]; then
             echo "/dev/$name KAMERA"
         fi
     done
 }
 
-for line in $(get_uuid); do
-    dev="/dev/$(echo $line | cut -d' ' -f1)"
-    label="$(echo $line | cut -d' ' -f2)"
+for line in $(get_disks); do
+    dev=$(echo $line | cut -d' ' -f1)
+    label=$(echo $line | cut -d' ' -f2)
 
     echo "Formatting $dev as $label..."
     mkfs.ext4 -F $dev
@@ -30,10 +30,10 @@ for line in $(get_uuid); do
 
     if [ "$label" == "MEDIA" ]; then
         mkdir -p /mnt/Media
-        echo "UUID=$uuid /mnt/Media ext4 defaults 0 2" >> /etc/fstab
+        grep -q "$uuid" /etc/fstab || echo "UUID=$uuid /mnt/Media ext4 defaults 0 2" >> /etc/fstab
     elif [ "$label" == "KAMERA" ]; then
         mkdir -p /mnt/Kamera
-        echo "UUID=$uuid /mnt/Kamera ext4 defaults 0 2" >> /etc/fstab
+        grep -q "$uuid" /etc/fstab || echo "UUID=$uuid /mnt/Kamera ext4 defaults 0 2" >> /etc/fstab
     fi
 done
 
